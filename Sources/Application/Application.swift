@@ -33,7 +33,12 @@ public class App {
 
         // Endpoints
         initializeHealthRoutes(app: self)
-        router.post( "/", handler: handleStore )
+        router.post( "/", handler: store )
+        router.delete( "/", handler: deleteAll )
+        router.get( "/", handler: getAll )
+        router.get( "/", handler: findById )
+        router.patch( "/", handler: update )
+        router.delete( "/", handler: deleteById )
 
         KituraOpenAPI.addEndpoints( to: router )
     }
@@ -48,7 +53,7 @@ public class App {
         workerQueue.sync(execute: block)
     }
 
-    internal func handleStore( input: ToDo, completion: ( ToDo?, RequestError? ) -> Void ) {
+    internal func store( input: ToDo, completion: ( ToDo?, RequestError? ) -> Void ) {
         var todo = input // create mutable copy
         execute {
             let id = nextId
@@ -62,6 +67,52 @@ public class App {
             todoStore.append( todo )
         }
         completion( todo, nil )
+    }
+
+    internal func deleteAll( completion: ( RequestError? ) -> Void ) {
+        execute {
+            todoStore = []
+        }
+        completion( nil )
+    }
+
+    internal func getAll( completion: ( [ ToDo ]?, RequestError? ) -> Void ) {
+        completion( todoStore, nil )
+    }
+
+    internal func findById( id: Int, completion: ( ToDo?, RequestError? ) -> Void ) {
+        guard let todo = todoStore.first( where: { $0.id == id } ) else {
+            completion( nil, .notFound )
+            return
+        }
+        completion( todo, nil )
+    }
+
+    internal func update( id: Int, todo: ToDo, completion: ( ToDo?, RequestError? ) -> Void ) {
+        guard let index = todoStore.index(where: { $0.id == id }) else {
+            completion( nil, .notFound )
+            return
+        }
+        var item = todoStore[ index ]
+        item.user = todo.user ?? item.user
+        item.order = todo.order ?? item.order
+        item.title = todo.title ?? item.title
+        item.completed = todo.completed ?? item.completed
+        execute {
+            todoStore[ index ] = item
+        }
+        completion( item, nil )
+    }
+
+    internal func deleteById( id: Int, completion: ( RequestError? ) -> Void ) {
+        guard let index = todoStore.index(where: { $0.id == id }) else {
+            completion( .notFound )
+            return
+        }
+        execute {
+            todoStore.remove(at: index)
+        }
+        completion( nil )
     }
 
 }
