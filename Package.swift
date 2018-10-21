@@ -14,15 +14,20 @@ let package = Package(
       .package(url: ibmPackageBase + "/Health.git", from: "1.0.0"),
       .package(url: ibmPackageBase + "/Kitura-OpenAPI.git", from: "1.0.0"),
       .package(url: ibmPackageBase + "/Kitura-CORS.git", from: "2.1.0"),
+      .package(url: ibmPackageBase + "/Swift-Kuery-ORM", from: "0.3.1"),
+      .package(url: ibmPackageBase + "/Swift-Kuery-PostgreSQL", from: "1.2.0"),
     ],
     targets: [
-      .target(name: "TodoServer", dependencies: [ .target(name: "Application"), "Kitura" , "HeliumLogger"]),
+      .target(name: "TodoServer",
+              dependencies: [ .target(name: "Application"), "Kitura" , "HeliumLogger"]),
       .target(name: "Application",
               dependencies: [
                 "Kitura", "CloudEnvironment","SwiftMetrics","Health",
-                "KituraOpenAPI", "KituraCORS"
+                "KituraOpenAPI", "KituraCORS", "SwiftKueryPostgreSQL",
+                "SwiftKueryORM"
               ]),
 
-      .testTarget(name: "ApplicationTests" , dependencies: [.target(name: "Application"), "Kitura","HeliumLogger" ])
+      .testTarget(name: "ApplicationTests",
+                  dependencies: [.target(name: "Application"), "Kitura","HeliumLogger" ])
     ]
 )
