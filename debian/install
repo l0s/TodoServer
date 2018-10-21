@@ -1,0 +1,3 @@
+.build/							usr/src/TodoServer
+terraform/scripts/install.sh	usr/src/TodoServer
+terraform/scripts/start.sh		usr/src/TodoServer
